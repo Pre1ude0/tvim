@@ -397,3 +397,17 @@ fn a_staged_rename_unstages_and_discards_as_a_whole() {
     assert!(!dir.join("b.txt").exists());
     assert_eq!(git(&dir, &["status", "--porcelain"]).unwrap(), "");
 }
+
+#[test]
+fn opening_git_menu_from_directory_explorer() {
+    let Some(dir) = repo("gitmenu-explorer", "initial\n") else {
+        return;
+    };
+    let mut e = Editor::new();
+    e.explore(&dir);
+    e.keys(&parse("<Esc><Space>G"));
+    e.wait_for_git_menu();
+    assert!(e.git_menu().is_some());
+    let m = e.git_menu().unwrap();
+    assert_eq!(m.repo_name(), dir.file_name().unwrap().to_str().unwrap());
+}
